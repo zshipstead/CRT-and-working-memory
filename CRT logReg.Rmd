@@ -1,0 +1,990 @@
+---
+title: 'Predicting the People Who Override Gut-Reactions: A Logistic Regression Analysis
+  of Working Memory Capacity and Cognitive Reflection Test Performance'
+author: |
+  | Zach Shipstead
+  | University of Illinois Urbana-Champaign
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: true
+    toc_depth: 3
+    theme: lumen
+  pdf_document: default
+  word_document: default
+
+---
+## Abstract
+The present study examined cognitive abilities as predictors of people's tendency to correct false impressions during problem solving. This was accomplished via a machine learning logistic regression analysis in which several indicators of a person's working memory capacity (the ability to mentally maintain and manipulate information) were used to predict whether that person would correctly answer each of three questions from the Cognitive Reflection Test (which is designed around misleading questions). Some models added previous-item-performance as a separate predictor of current-item-performance, in hopes that it would further clarify results. While it was found that aspects working memory capacity (in particular memory updating ability) can be used to predict performance on the Cognitive Reflection Test, previous-item-responding did not add predictive utility to the models. Furthermore, working memory capacity's predictive utility may be highest on early items, when the confusing aspects of the test are most novel.
+
+## Background
+>_A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How much does the ball cost?_
+
+The above question, which was drawn from the Cognitive Reflection Test, represents a specific situation in which a query leads people to an intuitive, yet incorrect, assumption. Although the correct answer is 5 cents, the wording creates an impression that the solution is 10 cents. Who are the people that can overcome this gut-reaction and think more deeply about the problem, and who are the people that give into their initial impulse?
+  
+The present analysis explores this question from the perspective of individual differences in working memory capacity. Working memory is the cognitive system that allows people to hold information in mind on an as-needed basis. Working memory capacity is a measure of how effectively the working memory system is functioning, on a person-by-person basis (Engle, 2002).
+  
+Individual differences in working memory capacity provide a likely candidate for predicting which people are capable of reconsidering their impressions of a misleading question. This is because working memory capacity is strongly related to attention control (Engle, 2002), distractability (Fukuda & Vogel, 2011), and complex reasoning (Oberauer et al., 2005). Moreover, working memory capacity predicts real-world cognition in ares such as reading comprehension (McVay & Kane, 2011), emotion regulation (Keider et al., 2009), and even the rate at which people learn the syntax of programming languages (Schute, 1991). This is to say that people who score high on tests of working memory capacity also tend to perform well in the above domains. People who score low on test of working memory capacity tend to struggle in the above domains.
+
+Shipstead, Harrison, and Engle (2016) propose that working memory capacity can be subdivided into three general cognitive functions. The first is executive attention control, which reflects the general efficacy with which a person's attention is applied to tasks. The second is working memory maintenance, which represents the stability with which information is held in mind. The third is updating (or "disengagement"), which represents a person's ability to keep memory clean by forgetting information when it becomes outdated. These three sub-mechanisms function in concert to allow for complex thought across a variety of contexts.
+
+### Working Memory Capacity and Cognitive Reflection
+
+Intuitively speaking, people with high working memory capacity should be well-equipped to override the pull toward first impressions. These people are good at dealing with verbal information, excel at keeping attention focused on the task at hand, and can forget outdated ideas. However, there are also reasons to believe that a person's cognitive abilities can only go so far when reasoning through problems, such as the one presented at the outset.
+
+Stanovich and West (2000) describe human thought as occurring in two stages, or systems. Processing begins in System 1, which is fast acting, automatic, and not guided by attention. In other words, this is where general impressions (e.g., "the ball costs 10 cents") are formed.
+
+This processing bleeds into System 2, which is slower, but attention-guided and thus more flexible. This stage allows for correction of thought patterns (e.g., "oh hold on, it's 5 cents!"). In other words, System 2 is where a person's working memory becomes a critical component of thinking. 
+
+Given this context, one might expect individual differences in working memory capacity to be a strong predictor of the ability to successfully override the false impressions of System 1. This makes sense, since people with high working memory capacity excel at the type of thinking that occurs in System 2. However, one legitimate concern is that people with high working memory capacity may never realize that they should attempt to make a correction to their thought patterns.
+
+As Kahneman (2003) points out, System 2 is typically lax in its monitoring for System 1 errors. In essence, most people tend toward cognitive miserliness, and only think deeply about issues once they see the personal relevance of doing so. High cognitive capacities and general need for deep engagement are not the same thing. As such, even people with high working memory capacity may fail to monitor their initial impressions, especially if they have no indication that their reasoning was faulty. 
+
+### Post-Hoc Measurement of Tendency Toward Deep thought
+
+The data used in the present study were preexisting, and only contained measures of cognitive ability. The shortcoming is that, while deep and critical thinking are certainly facilitated by high cognitive ability, the desire to engage in deep thought is better thought of as a personality characteristic. In the absence of direct measurement of such a personality characteristic, an attempt was made to construct a measurement via the available data.
+
+In this case, a person's ability to correctly answer a Cognitive Reflection question, at some point, does reflect a tendency to slow down and consider that their initial impression was mistaken. As such, performance on Question 1 may add to the ability to accurately predict Question 2, above-and-beyond traditional cognitive variables. People with certain personality traits would be more prone to reconsidering their responses than would other people.
+
+Whether previous-item-performance adds to the model is, however, an open question. On one hand, Question 1 performance may reflect personality characteristics, above-and-beyond cognitive ability. In this case, adding previous-item-perfomance to the model would lead to more accurate predictions. On the other hand, the importance of high cognitive ability to correctly answering Question 1 may be too strong. In this case, adding previous-item-performance to a model will simply be redundant and accuracy of predictions would not improve. 
+
+## The Present Study
+
+This study examined our ability to use different aspects of working memory capacity to differentiate people who are likely to adjust their false impressions from people who are unlikely to do so. Additionally, performance on previous cognitive reflection test items was added to models, as it was expected that people who have correctly responded to one item would approach subsequent items in a different manner. Thus, previous item performance was examined as a potential clarifier of outcomes.
+
+Modelling and analysis were carried out via logistic regression, which examines the associations between multiple predictors (a person's attention, maintenance, and updating abilities)  and a specific outcome (e.g., correct answer on a test question). Through this, logistic regression can provide data needed to make a prediction: Given a person's cognitive abilities, is that person likely to answer a given question correctly or incorrectly? 
+
+These logistic regressions were carried out within a machine learning paradigm in which models of performance were created using a subset of the data (training set). After creation, the model parameters were then used to predict people's performance using the subset of data that was not included in training (validation data). 
+
+
+### Outcome Test: Cognitive Reflection
+
+The ability to override first impressions was defined as performance on the cognitive reflection test (CRT). The CRT is a 3-question examination, from which the above reasoning problem was drawn (all three test questions are available in Appendix A). Questions were always asked in the same order, due to a need to avoid subject-by-treatment interactions.
+
+Separate models were created for performance on each of the three questions, as it was assumed that CRT performance is an evolving process. 
+
+
+### Cognitive Predictors: Working Memory Capacity
+
+Consistent with the perspective of Shipstead et al. (2016), working memory capacity was defined through three varieties of cognitive test: attention control, maintenance, and updating. The present data set included several measures of each of these capabilities. Examples and details of each variety of test can be found in Appendix B. Relevant descriptive statistics can be found in Appendix C.
+
+In brief, tests of _attention control_ require test takers to overcome a reflexive response (e.g., move your eyes toward a peripheral flash), and instead perform a test-relevant action (e.g., move your eyes away from a peripheral flash). Tests of _maintenance_ require test takers to remember a list of items, despite constant distraction (e.g., remember a list of letters, while solving math problems). _Updating_ tests present more information than a test taker will need to remember. What is important is the ability to forget information as it becomes outdated, and focus on the relevant subset of information. This represents the ability to prevent mental clutter (e.g., not returning to an initial, incorrect, assumption regarding the correct answer).
+
+As stated, this data set included a variety of tests of each of these three cognitive abilities. In order to reduce complexity and increase interpretability of the models, the individual tests were combined into three z-score composites that represented each of the three factors (these groupings are supported by factor analysis; see Martin et al. [2020] and Shipstead et al. [2015]). Z-scores transform different test scores to be on the same scale, thus allowing them to be averaged into one score (the z-score composite).
+
+```{r, echo=FALSE, comment=NA} 
+# Load Data
+setwd("~/PC Docs/R files/Machine Learning/CRT Prediction/1 Raw Data")
+composites <- read.csv("composites.csv")
+setwd("/Users/zachshipstead/PC Docs/R files/Machine Learning/CRT Prediction/3. CRT writeup")
+
+# Info in table
+relations <- as.data.frame(cor(composites[2:6]))
+relations <- relations[c(3,1,2), c(4,5)]
+colnames(relations) <- c("Fluid Intelligence", "Verbal Reasoning")
+rownames(relations) <- c("Attention", "Maintenance", "Updating")
+# format(relations, digits = 2)
+
+knitr::kable(relations, caption = "Table 1. The correlations between working memory components and reasoining abilities.", digits = 2, alig='c')
+```
+
+The validity of these tests as measures of complex cognition is demonstrated in Table 1. As can be seen, each of the three working memory composite scores had a fairly strong correlation to fluid intelligence (reasoning with novel/abstract information) as well as to verbal reasoning (e.g., word analogies). Note that the intelligence tests were excluded from the examination of CRT performance, as this would have amounted to explaining reasoning with reasoning.
+
+### Perfomrance-Related Predictors: Previous CRT Items 
+
+As testing proceeds from CRT Question 1 to Question 3, it is reasonable to assume that a person who overrides the impulse to provide the incorrect response on one question will do so on the next. As such, previous-item-performance can provide a new source of prediction. Therefore, alternate models were created for Questions 2 and 3, which included the person's test performance up to that point as a predictor of present-item performance.
+
+### The Data Set
+
+Portions of the present data were reported in Martin et al (2020), and were collected as part of a comprehensive screening of various cognitive abilities. 573 people completed 49 cognitive tests across four 2-hour sessions. Missing data points were imputed using expectation-maximization. 
+
+Data were split with 75% (n = 402) being used in the process of model training, with the remaining 25% (n = 132) being held out as the test set for model validation. Although it is typical to split data sets to equate the dependent variable, in this case each of the 3 CRT responses served as a unique dependent variable. This prevented a clean split from being made.
+
+The data set, however, did include Raven's Advanced Progressive Matrices, which is considered to be the best single predictor of human reasoning ability (Jensen, 1998). Since this test did not figure into the primary analyses, data were split along this factor, ensuring that the training and validation groups were cognitively similar.
+
+## Results  
+
+### CRT Performance and Initial Analyses
+
+```{r, echo=FALSE, comments=NA}
+setwd("~/PC Docs/R files/Machine Learning/CRT Prediction/4. Tree/Reconstruct data")
+trainComposites <- read.csv("trainComposites.csv")
+testComposites <- read.csv("testComposites.csv")
+FigureData <- trainComposites
+
+# Table for training data
+crtTrainTable <- t(psych::describe(trainComposites[7:9])[c(3)]) 
+colnames(crtTrainTable) <- c("Question 1", "Question 2", "Question 3")
+rownames(crtTrainTable) <- "Percent Correct Response (Training Data Set)"
+
+# Table for validation data
+crtValidateTable <- t(psych::describe(testComposites[7:9])[c(3)])
+colnames(crtValidateTable) <- c("Question 1", "Question 2", "Question 3")
+rownames(crtValidateTable) <- "Percent Correct Response (Validation Data Set)"
+
+# combine tables
+knitr::kable(rbind(crtTrainTable, crtValidateTable), caption = "Table 2. Percentage of test takers who provided the correct response on each question of the Cognitive Reflection Test.", digits = 2, alig='c') 
+```
+
+Table 2 presents the percentage of test takers who correctly responded to each CRT question in both the training and validation data sets. As can be seen, performance was quite low on the first two questions: Fewer than 20% of people correctly answered either question. 
+
+Performance improved substantially on the third item: 33% of all people answered it correctly (across training and validation sets). This may indicate that people were starting to understand the nature of the CRT, and were thus attempting to correct their impressions later in the test. However, since the questions were always presented in the same order, it cannot be ruled out that Question 3 was simply easier. 
+
+```{r, echo=FALSE, comments=NA}
+
+# Make correlation matrix
+matrixData <- FigureData
+matrixData$CRT <- matrixData$CRT_1 + matrixData$CRT_2 + matrixData$CRT_3
+corMatrix <- format(round(cor(matrixData[c(10,4,2,3)]), 2), nsmall=2)
+corMatrix[upper.tri(corMatrix, diag = TRUE)] <- "-"
+corMatrix[upper.tri(corMatrix, diag = FALSE)] <- ""
+colnames(corMatrix) <- c("CRT", "Attention", "Maintenance", "Updating")
+rownames(corMatrix) <- c("CRT", "Attention", "Maintenance", "Updating")
+
+knitr::kable(corMatrix, caption = "Table 3. Correlations among working memory components and overall CRT performance.", digits = 2, alig='c') 
+```
+Table 3 presents the correlations among the working memory capacity predictor variables and a composite score of all three CRT questions. Indeed, the correlations to CRT performance are reasonably strong, indicating that these cognitive tests are valid predictors of performance. This is particularly true of the correlation between CRT and updating. 
+
+### Modelling CRT Performance 
+
+Machine learning was conducted using R's Caret package. Within this procedure logistic regressions were performed with R's base generalized linear model. Cross-validation was performed, such that the training data were split into 5 folds (divisionas), and 4 were used to build a model and the 5th was used for validation. Folds were rotated, such that each was used in validation. This process was repeated 10 times to yield a mean model that is less data-specific, and therefore more generalizable to novel data.
+
+```{r echo=FALSE, comments=NA, warning=FALSE, message =FALSE}
+library(caret)
+library(tidyverse)
+
+trainComposites$CRT_1 <- as.factor(trainComposites$CRT_1)
+trainComposites$CRT_2 <- as.factor(trainComposites$CRT_2)
+trainComposites$CRT_3 <- as.factor(trainComposites$CRT_3)
+
+
+# Model 1
+set.seed(919)
+Item_1 <- train(CRT_1 ~ ., data = trainComposites[-c(1,5,6,8,9)],
+                method = "glm",
+                trControl = trainControl(method = "repeatedcv", number = 5,
+                                         repeats = 10),
+                family = "binomial"
+                )
+# Model 2a - No Q1
+set.seed(919)
+Item_2 <- train(CRT_2 ~ ., data = trainComposites[-c(1,5,6,7,9)],
+                method = "glm",
+                trControl = trainControl(method = "repeatedcv", number = 5,
+                                         repeats = 10),
+                family = "binomial"
+                )
+# Model 2b - Yes Q1
+set.seed(919)
+Item_2b <- train(CRT_2 ~ ., data = trainComposites[-c(1,5,6,9)],
+                method = "glm",
+                trControl = trainControl(method = "repeatedcv", number = 5,
+                                         repeats = 10),
+                family = "binomial")
+# Model 3a - No Q1, Q2
+set.seed(919)
+Item_3 <- train(CRT_3 ~ ., data = trainComposites[-c(1,5,6,7,8)],
+                method = "glm",
+                trControl = trainControl(method = "repeatedcv", number = 5,
+                                         repeats = 10),
+                family = "binomial"
+                )
+# Model 3b - Yes Q1 & Q2
+set.seed(919)
+Item_3b <- train(CRT_3 ~ ., data = trainComposites[-c(1,5,6)],
+                 method = "glm",
+                 trControl = trainControl(method = "repeatedcv", number = 5,
+                                          repeats = 10),
+                 family = "binomial"
+                 )
+
+# Check statistical significance of coefficients for table
+sigCHK <- function(pVal){
+  case_when(
+    pVal < .001 ~ "***",
+    pVal < .01 & pVal > .001 ~ "**",
+    pVal < .05 & pVal > .01 ~ "*",
+    pVal > .05 ~ "",
+  )
+}
+
+
+# Table to store values
+Table3 <- as.data.frame(matrix(nrow = 5, ncol= 8))
+colnames(Table3) <- c("Model", "Intercept", "Attention", "Maintenance", "Update", "Question 1", "Question 2", "AIC")
+
+#Model 1
+Table3$Model[1] <- "Question 1"
+Table3$Intercept[1] <- paste0(format(round(summary(Item_1)$coefficients[1], 2), nsmall = 
+                                       2), sigCHK(summary(Item_1)$coefficients[,4][1]))
+Table3$Attention[1] <- paste0(format(round(summary(Item_1)$coefficients[4], 2), nsmall =
+                                       2), sigCHK(summary(Item_1)$coefficients[,4][4]))
+Table3$Maintenance[1] <- paste0(format(round(summary(Item_1)$coefficients[2], 2), nsmall = 
+                                         2), sigCHK(summary(Item_1)$coefficients[,4][2]))
+Table3$Update[1] <- paste0(format(round(summary(Item_1)$coefficients[3], 2), nsmall = 2),
+                           sigCHK(summary(Item_1)$coefficients[,4][3]))
+Table3$`Question 1`[1] <- "-"
+Table3$`Question 2`[1] <- "-"
+Table3$AIC[1] <- format(round(summary(Item_1)$aic, 2), nsmall = 2)
+
+#Model 2a
+Table3$Model[2] <- "Question 2a"
+Table3$Intercept[2] <- paste0(format(round(summary(Item_2)$coefficients[1], 2), nsmall =
+                                       2), sigCHK(summary(Item_2)$coefficients[,4][1]))
+Table3$Attention[2] <- paste0(format(round(summary(Item_2)$coefficients[4], 2), nsmall =
+                                       2), sigCHK(summary(Item_2)$coefficients[,4][4]))
+Table3$Maintenance[2] <- paste0(format(round(summary(Item_2)$coefficients[2], 2), nsmall =
+                                         2), sigCHK(summary(Item_2)$coefficients[,4][2]))
+Table3$Update[2] <- paste0(format(round(summary(Item_2)$coefficients[3], 2), nsmall = 2), 
+                           sigCHK(summary(Item_2)$coefficients[,4][3]))
+Table3$`Question 1`[2] <- "-"
+Table3$`Question 2`[2] <- "-"
+Table3$AIC[2] <- format(round(summary(Item_2)$aic, 2), nsmall = 2)
+
+#Model 2b
+Table3$Model[3] <- "Question 2b"
+Table3$Intercept[3] <- paste0(format(round(summary(Item_2b)$coefficients[1], 2), nsmall =
+                                       2), sigCHK(summary(Item_2b)$coefficients[,4][1]))
+Table3$Attention[3] <- paste0(format(round(summary(Item_2b)$coefficients[4], 2), nsmall =
+                                       2), sigCHK(summary(Item_2b)$coefficients[,4][4]))
+Table3$Maintenance[3] <- paste0(format(round(summary(Item_2b)$coefficients[2], 2), nsmall =
+                                         2), sigCHK(summary(Item_2b)$coefficients[,4][2]))
+Table3$Update[3] <- paste0(format(round(summary(Item_2b)$coefficients[3], 2), nsmall = 2),
+                           sigCHK(summary(Item_2b)$coefficients[,4][3]))
+Table3$`Question 1`[3] <- paste0(format(round(summary(Item_2b)$coefficients[5], 2), nsmall
+                                        = 2), sigCHK(summary(Item_2b)$coefficients[,4][5]))
+Table3$`Question 2`[3] <- "-"
+Table3$AIC[3] <- format(round(summary(Item_2b)$aic,2), nsmall = 2)
+
+#Model 3a
+Table3$Model[4] <- "Question 3a"
+Table3$Intercept[4] <- paste0(format(round(summary(Item_3)$coefficients[1], 2), nsmall =
+                                       2), sigCHK(summary(Item_3)$coefficients[,4][1]))
+Table3$Attention[4] <- paste0(format(round(summary(Item_3)$coefficients[4], 2), nsmall =
+                                       2), sigCHK(summary(Item_3)$coefficients[,4][4]))
+Table3$Maintenance[4] <- paste0(format(round(summary(Item_3)$coefficients[2], 2), nsmall =
+                                         2), sigCHK(summary(Item_3)$coefficients[,4][2]))
+Table3$Update[4] <- paste0(format(round(summary(Item_3)$coefficients[3], 2), nsmall = 2), 
+                           sigCHK(summary(Item_3)$coefficients[,4][3]))
+Table3$`Question 1`[4] <- "-"
+Table3$`Question 2`[4] <- "-"
+Table3$AIC[4] <- format(round(summary(Item_3)$aic, 2), nsmall = 2)
+
+#Model 3b
+Table3$Model[5] <- "Question 3b"
+Table3$Intercept[5] <- paste0(format(round(summary(Item_3b)$coefficients[1], 2), nsmall =
+                                       2), sigCHK(summary(Item_3b)$coefficients[,4][1]))
+Table3$Attention[5] <- paste0(format(round(summary(Item_3b)$coefficients[4], 2), nsmall =
+                                       2), sigCHK(summary(Item_3b)$coefficients[,4][4]))
+Table3$Maintenance[5] <- paste0(format(round(summary(Item_3b)$coefficients[2], 2), nsmall =
+                                         2), sigCHK(summary(Item_3b)$coefficients[,4][2]))
+Table3$Update[5] <- paste0(format(round(summary(Item_3b)$coefficients[3], 2), nsmall = 2), 
+                           sigCHK(summary(Item_3b)$coefficients[,4][3]))
+Table3$`Question 1`[5] <- paste0(format(round(summary(Item_3b)$coefficients[5], 2), nsmall
+                                        = 2), sigCHK(summary(Item_3b)$coefficients[,4][5]))
+Table3$`Question 2`[5] <- paste0(format(round(summary(Item_3b)$coefficients[6], 2), nsmall
+                                        = 2), sigCHK(summary(Item_3b)$coefficients[,4][6]))
+Table3$AIC[5] <- format(round(summary(Item_3b)$aic, 2), nsmall = 2)
+# Present Table
+knitr::kable(Table3, caption = "Table 4. Logistic Regression Model Coefficients when Predicting each CRT Question. note on statistical significance: p<.001 *** , p<.01 ** , p<.05 * ", alig='l')
+```
+Table 4 presents the coefficients of each model that was trained to predict performance on one the three CRT questions. These coefficients represent changes to the log odds of a correct vs. incorrect response, per unit change in the given predictor. As predictor coefficients are positive and all cognitive predictors (attention, maintenance, updating) were on the same scale, interpretation is straightforward: Bigger is better.
+
+Models with an "a" were run with only cognitive variables as predictors. Models with a "b" were run with both cognitive variables and previous-question performance as predictors. Stars indicate degree of statistical significance (see table note).
+
+First, focusing on the models that are strictly cognitive (1, 2a, 3a), memory updating is consistently important. Given that the three CRT questions were designed to require test takers to alter an initial impression, this relationship to updating is a coherent outcome: Memory updating ability is an important component of thought-correction.
+
+It is somewhat surprising that maintenance capacity decreased in importance and that attention control was never a strong predictor of performance. One might expect that a person's ability to stably hold a representation of the CRT problem in mind would be of particular importance. However, given that memory updating likely requires maintaining information and using attention to suppress outdated information, this result may simply indicate that memory updating tests provide the most complete assessment of a person's overall working memory capacity (Martin et al., 2020).
+
+Second, the case for including previous-item-performance as a predictor of current-item-performance is equivocal at this point. Examining Models 2b and 3b, previous-item-performance was a statistically significant predictor of current-item-success (at least during model training). Moreover, the meaningfulness of these predictors was reinforced in the AIC column of Table 4. AIC is an indicator of the trade off between increasing model complexity and improved prediction. Lower numbers indicate that the loss of parsimony is offset by increased explanation. This occurred in both cases of models a-vs-b.
+
+```{r, echo=FALSE, comments=NA, warning=FALSE, message =FALSE, fig.height = 3, fig.cap="Figure 1. Median training accuracy for models with (b) and without (a) previous-item-performance as a predictor."}
+
+library(ggplot2)
+library(tidyverse)
+library(patchwork)
+
+bw2 <- resamples(list(Question2b=Item_2b, Question2a=Item_2))
+bw3 <- resamples(list(Question3b=Item_3b, Question3a=Item_3))
+
+bw2ACC <- bw2$values %>% 
+  select(1, ends_with("Accuracy")) %>% 
+  gather(model, Accuracy, -1) %>% 
+  mutate(model = sub("~Accuracy", "", model)) %>% 
+  ggplot()+ 
+  geom_boxplot(aes(x = Accuracy, y = model))+
+  coord_cartesian(xlim = c(.65,1))+
+  scale_y_discrete(limits = c("Question2b", "Question2a"))+
+  theme_classic()
+
+bw3ACC <- bw3$values %>% 
+  select(1, ends_with("Accuracy")) %>% 
+  gather(model, Accuracy, -1) %>% 
+  mutate(model = sub("~Accuracy", "", model)) %>% 
+  ggplot()+ 
+  geom_boxplot(aes(x = Accuracy, y = model))+
+  scale_y_discrete(limits = c("Question3b", "Question3a"))+
+  coord_cartesian(xlim = c(.65,1))+
+  theme_classic()
+
+bw2ACC + bw3ACC
+
+```
+
+Conversely, note that the magnitude of the cognitive variables' coefficients decreased when previous-item-performance was added to the model. This does not mean that cognition was less important. Instead, it simply indicated that individual differences in the cognitive variables were redundantly represented in previous-item-performance. This makes sense if cognitive ability played into making a correct response on than previous-item.
+
+Unfortunately, that interpretation implies that the predictive power that is being carried over by previous-item-performance is simply a reiteration of people's cognitive abilities. Whereas the intent was to capture something unique, like a personality tendency toward deep thought, previous-item-performance may be mostly redundant variance that is already expressed in people's cognitive abilities.
+
+This concern is reinforced in Figure 1, which displays the median accuracy of prediction of the training data, across all 50 runs of cross validation. If the addition of previous-item-accuracy was contributing to better outcomes, one might expect higher accuracy. There does seem to be a trend toward higher accuracy associated with the included predictors, however, this is tempered by the fact that the (a)- and (b)-versions of the models showed overlap in their interquartile ranges. The validity of previous-item-performance is questionable at this point.
+
+### High Working Memory Capacity as a Prerequisite for CRT Performance
+
+```{r, echo=FALSE, comments=NA, warning=FALSE, message =FALSE, fig.height = 3, fig.cap="Figure 2. The general relation between working memory capacity predictors and CRT Question 1 performance."}
+
+
+p1 <- ggplot(FigureData, aes(x=Attention, y=CRT_1)) + 
+   geom_point(alpha=.5) +
+   stat_smooth(method = "glm", se=FALSE, method.args = list(family=binomial),
+               col = "steelblue")+
+   labs(x="Attention Ability", y="Question 1 Performance", title="(A)")+
+   coord_cartesian(xlim=c(-2,2))+
+   theme_classic()
+
+p2 <- ggplot(FigureData, aes(x=WMmaintenance, y=CRT_1)) + 
+   geom_point(alpha=.5) +
+   stat_smooth(method = "glm", se=FALSE, method.args = list(family=binomial),
+               col = "steelblue")+
+   labs(x="Maintenance Ability", y="Question 1 Performance", title="(B)")+
+   coord_cartesian(xlim=c(-2,2))+
+   theme_classic()
+
+p3 <- ggplot(FigureData, aes(x=WMupdate, y=CRT_1)) + 
+   geom_point(alpha=.5) +
+   stat_smooth(method = "glm", se=FALSE, method.args = list(family=binomial),
+               col = "steelblue")+
+   labs(x="Updating Ability", y="Question 1 Performance", title="(C)")+
+   coord_cartesian(xlim=c(-2,2))+
+   theme_classic()
+
+p1 + p2 + p3
+```
+
+Deeper analyses of the training data revealed an interesting trend that seems predictable in hindsight. Figure 2 respectively presents the relationship between either (a) attention, (b) maintenance, or (c) updating ability and performance on CRT Question 1. Two aspects of this figure require elaboration.
+
+First, each dot along the x-axis represents one person's standardized working memory component score, with zero being average. Dots at the top of the y-axis represent a correct response, dots at the bottom represent an incorrect response. 
+
+As can be seen, correct responses tended to be restricted to the higher end of the maintenance and updating spectra. This was expected, however, the issue is that incorrect responses never quite disappeared from the higher end: Many people with high working memory ability failed to make the correct response. In other words, high working memory capacity is a prerequisite correcting one's false impression of the CRT problem, but it is not sufficient to predict that someone will.   
+
+```{r, echo=FALSE, comments=NA, warning=FALSE, message =FALSE, fig.height = 6, fig.cap="Figure 3. The general relation between working memory capacity predictors and CRT Questions 2 (A-C) and 2 (D-F) performance."}
+
+library(ggplot2)
+library(patchwork)
+
+a1 <- ggplot(FigureData, aes(x=Attention, y=CRT_2)) + 
+   geom_point(alpha=.5) +
+   stat_smooth(method = "glm", se=FALSE, method.args = list(family=binomial),
+               col = "steelblue")+
+   labs(x="Attention Ability", y="Question 2 Performance", title="(A)")+
+   coord_cartesian(xlim=c(-2,2))+
+   theme_classic()
+
+a2 <- ggplot(FigureData, aes(x=WMmaintenance, y=CRT_2)) + 
+   geom_point(alpha=.5) +
+   stat_smooth(method = "glm", se=FALSE, method.args = list(family=binomial),
+               col = "steelblue")+
+   labs(x="Maintenance Ability", y="Question 2 Performance", title="(B)")+
+   coord_cartesian(xlim=c(-2,2))+
+   theme_classic()
+
+a3 <- ggplot(FigureData, aes(x=WMupdate, y=CRT_2)) + 
+   geom_point(alpha=.5) +
+   stat_smooth(method = "glm", se=FALSE, method.args = list(family=binomial),
+               col = "steelblue")+
+   labs(x="Updating Ability", y="Question 2 Performance", title="(C)")+
+   coord_cartesian(xlim=c(-2,2))+
+   theme_classic()
+
+a4 <- ggplot(FigureData, aes(x=Attention, y=CRT_3)) + 
+   geom_point(alpha=.5) +
+   stat_smooth(method = "glm", se=FALSE, method.args = list(family=binomial),
+               col = "steelblue")+
+   labs(x="Attention Ability", y="Question 3 Performance", title="(D)")+
+   coord_cartesian(xlim=c(-2,2))+
+   theme_classic()
+
+a5 <- ggplot(FigureData, aes(x=WMmaintenance, y=CRT_3)) + 
+   geom_point(alpha=.5) +
+   stat_smooth(method = "glm", se=FALSE, method.args = list(family=binomial),
+               col = "steelblue")+
+   labs(x="Maintenance Ability", y="Question 3 Performance", title="(E)")+
+   coord_cartesian(xlim=c(-2,2))+
+   theme_classic()
+
+a6 <- ggplot(FigureData, aes(x=WMupdate, y=CRT_3)) + 
+   geom_point(alpha=.5) +
+   stat_smooth(method = "glm", se=FALSE, method.args = list(family=binomial),
+               col = "steelblue")+
+   labs(x="Updating Ability", y="Question 3 Performance", title="(F)")+
+   coord_cartesian(xlim=c(-2,2))+
+   theme_classic()
+
+a1+a2+a3+a4+a5+a6
+```
+
+Having stated this, it appears as though this relationship is most apparent when the task is novel. This is apparent in Figure 3, which displays responses to Questions 2 and 3. As can be seen, the distribution of the cognitive abilities of correct-responders appears to widen, relative to Question 1. This may account for the large jump in correct responses that occurred on Question 3 (Table 2): A wider range of people are capable of properly responding. This implies that the line between high- and low-ability individuals can blur across items. In turn it may become progressively more difficult to predict correct responders (i.e. from Question 1 to Question 3) when the models are applied to the validation data set.
+
+The second concern that stems from this pre-analysis relates to the trend lines in Figures 2 and 3. These lines represent the probability that a person will make a correct response (numerically represented on the y-axis), on the basis of a given cognitive ability. In most categorization situations it is convention to predict that anyone whose probability is above 50% will make a correct response, while anyone whose probability below 50% will make an incorrect response.
+
+Approaching the training data in this manner does lead to reasonable accuracy (above 80% correct categorization), but it comes at an analytically cost. Due to the muddied distinction between correct responders and incorrect responders, the probability of a correct response rarely even approaches 75% on the high end. 
+
+```{r, echo=FALSE, comments=NA}
+
+# Get predictions with training data
+CRT_1_Probs <- predict(Item_1, trainComposites, type = "prob")
+CRT_1_Predict <- ifelse(CRT_1_Probs$`1` >.5, 1, 0)
+CRT_1_Stuff <- caret::confusionMatrix(as.factor(CRT_1_Predict), trainComposites$CRT_1, positive = "1")
+
+# Make table 
+Train1Table <- as.data.frame(matrix(nrow=2, ncol=6))
+colnames(Train1Table) <- c("Incorrect", "Correct", "   |  ", "Accuracy", "Sensitivity", "Specificity")
+
+# Fill table (confusion matrix)
+rownames(Train1Table) <- c("Predicted to be Incorrect", "Predicted to be Correct")
+for (i in 1:2){
+  for (j in 3:6){
+    Train1Table[i,j] <- " "
+  }
+}
+for (i in 1:2){
+  for (j in 1:2){
+    Train1Table[i,j] <- CRT_1_Stuff$table[i,j]
+  }
+}
+
+# Fill rest of table
+Train1Table$Accuracy[1] <- round(CRT_1_Stuff$overall[1], 2)
+Train1Table$Sensitivity[1] <- round(CRT_1_Stuff$byClass[1], 2)
+Train1Table$Specificity[1] <- round(CRT_1_Stuff$byClass[2], 2)
+
+knitr::kable(Train1Table, caption = "Table 5. Confusion Matrix, Accuracy, Sensitivity, and Specificity for Question 1 (Training Data)", alig='c')
+```
+
+The concernm that this raises is made concrete in Table 5, which presents the confusion matrix, accuracy, sensitivity, and specificity when the Question 1 Model is applied to the data on which it was trained (which therefore represents the optimistic perspective). Although accuracy was high (83% correct identification), this was associated with low sensitivity (i.e., poor detection of correct responders): Although people are typically correctly categorized, this is mostly due to a combination of relatively few correct responses, mixed with the decision process being biased toward predicting "incorrect" (this is reflected in the high specificity, or correct identification of incorrect-responders).
+
+Since the goal is to predict the rare correct-responders, this is an unhelpful path to follow. Thus, in order to meet the present research objectives, the threshold for predicting a correct response needed to be adjusted. That is to say, if correct responders are to be identified, the bar for predicting "correct response" needs to be lowered below 50%.
+
+One traditional method for making such an adjustment is to search for the optimal point of informativeness via examination of the receiver operator characteristic curve. In essence, this process requires a search for the point of optimal tradeoff between true positives and false positives. However, with imbalanced data, such as these (i.e., rare correct responses), Matthew's correlation coefficient (MCC) can be a more reliable estimator of the optimal threshold. MCC takes into account true positives, false positives, true negatives, and false negatives. As a general property, it increases as these four indicators come into balance.
+
+Prior to making predictions on the validation data, the trained models were provided with a series of thresholds, for which MCC was calculated. This threshold was later applied to predictions that were made using probabilities that the model generated on the validation data. 
+```{r echo=FALSE, comments=NA, warning=FALSE, message =FALSE}
+#MCC calculation, found at https://www.kaggle.com/rohanrao/r-implementation-of-mcc-optimization
+mcc <- function(TP, FP, FN, TN)
+{
+  num <- (TP*TN) - (FP*FN)
+  den <- (TP+FP)*(TP+FN)*(TN+FP)*(TN+FN)
+  
+  if (den == 0)
+  {
+    return(0)
+  }else
+  {
+    return(num / sqrt(den))
+  }
+}
+
+#cycle through thesholds to find maximal MCC
+mccThresh <- function(lrModel, dataset, dv){
+  # For storing data...row 101 stores highest MCC result
+  mccInfo <- as.data.frame(matrix(nrow=101, ncol = 2))
+  colnames(mccInfo) <- c("Threshold", "MCC")
+  # For tracking results
+  mccX <- NULL
+  mccGreatest <- 0
+  threshold <- NULL
+  j <- 0
+  # Search the data
+  for (i in seq(.01, 1.0, .01)){
+    # Use i as threshold
+    TrainProb <- predict(lrModel, dataset, type="prob")
+    TrainYes <- ifelse(TrainProb$`1` > i, 1, 0)
+    cmat <- suppressWarnings(confusionMatrix(as.factor(TrainYes), 
+                                             dataset[[dv]], positive="1"))
+    TP <- cmat$table[2,2]
+    FP <- cmat$table[2,1]
+    FN <- cmat$table[1,2]
+    TN <- cmat$table[1,1]
+    # send output for MCC calculation
+    mccX <- mcc(TP, FP, FN, TN)
+    if (mccX > mccGreatest) {
+      mccGreatest <- mccX
+      mccInfo[101,2] <- mccX
+      mccInfo[101,1] <- i
+    }
+    # store results
+    j <- j+1
+    mccInfo[j, 1] <- i
+    mccInfo[j, 2] <- mccX
+  }
+  mccInfo
+}
+
+# Call to derive optimal thresholds
+MCC_Q1 <- mccThresh(Item_1, trainComposites, "CRT_1")
+MCC_Q2a <- mccThresh(Item_2, trainComposites, "CRT_2")
+MCC_Q2b <- mccThresh(Item_2b, trainComposites, "CRT_2")
+MCC_Q3a <- mccThresh(Item_3, trainComposites, "CRT_3")
+MCC_Q3b <- mccThresh(Item_3b, trainComposites, "CRT_3")
+
+# Make table
+mccTable <- as.data.frame(matrix(nrow = 5, ncol=3))
+colnames(mccTable) <- c("Optimal Threshold", "MCC at Optimal Threshold", "MCC at .31")
+rownames(mccTable) <- c("Question 1", "Question 2a", "Question 2b", 
+                        "Question 3a", "Question 3b")
+mccTable[1,1:2] <- MCC_Q1[101,1:2]
+mccTable[2,1:2] <- MCC_Q2a[101,1:2]
+mccTable[3,1:2] <- MCC_Q2b[101,1:2]
+mccTable[4,1:2] <- MCC_Q3a[101,1:2]
+mccTable[5,1:2] <- MCC_Q3b[101,1:2]
+
+# Put contents of row 31 (.31) into table
+mccTable[1,3] <- MCC_Q1[31, 2]
+mccTable[2,3] <- MCC_Q2a[31, 2]
+mccTable[3,3] <- MCC_Q2b[31, 2]
+mccTable[4,3] <- MCC_Q3a[31, 2]
+mccTable[5,3] <- MCC_Q3b[31, 2]
+
+knitr::kable(format(round(mccTable, 2), nsmall = 2), caption = "Table 6. Extracted threshold and associated MCC for each trained model", alig='c')
+
+```
+
+Table 6 presents the optimal training-data thresholds that could be used to generate predictions on the validation data set. The full range of Threshold-MCC values generated by the search is available in Appendix D. 
+
+The optimal threshold ranged from .26 to .39, from model to model. This variation would be fine if these models were each examined in isolation, however, they were examined in light of one another. As such, a consistent threshold needed to be maintained.
+
+The compromise was to set the threshold to the average of all 5 values, which is .31. As can be seen in the final column on Table 6, the MCC for cognitive-only models (1, 2a, 3a) was minimally affected, which was desired. There is a somewhat greater deviation for the cognitive-plus-previous-response models (2b and 3b), but this was acceptable. These models, in and of themselves, were intended to deviate from 2a and 3a, and thus should do so within the context of the original models and procedures. 
+
+
+
+### Performance of the Cognitive Predictors in the Validation Data Set
+```{r echo=FALSE, comments=NA, warning=FALSE, message =FALSE}
+
+testComposites$CRT_1 <- as.factor(testComposites$CRT_1)
+testComposites$CRT_2 <- as.factor(testComposites$CRT_2)
+testComposites$CRT_3 <- as.factor(testComposites$CRT_3)
+
+# Model 1 test data
+Model1_Test_Probs <- predict(Item_1, testComposites, type = "prob")
+Model1_Test_Predict <- ifelse(Model1_Test_Probs$`1` >.31, 1, 0)
+Model1_Test_Stuff <- caret::confusionMatrix(as.factor(Model1_Test_Predict), 
+                                            testComposites$CRT_1, positive = "1")
+# Model 2a test data
+Model2a_Test_Probs <- predict(Item_2, testComposites, type = "prob")
+Model2a_Test_Predict <- ifelse(Model2a_Test_Probs$`1` >.31, 1, 0)
+Model2a_Test_Stuff <- caret::confusionMatrix(as.factor(Model2a_Test_Predict), 
+                                            testComposites$CRT_2, positive = "1")
+# Model 3a test data
+Model3a_Test_Probs <- predict(Item_3, testComposites, type = "prob")
+Model3a_Test_Predict <- ifelse(Model3a_Test_Probs$`1` >.31, 1, 0)
+Model3a_Test_Stuff <- caret::confusionMatrix(as.factor(Model3a_Test_Predict), 
+                                            testComposites$CRT_3, positive = "1")
+
+# Initialize empty confusion matrices
+confMatrix1 <- as.data.frame(matrix(nrow = 3, ncol = 2))
+colnames(confMatrix1) <- c("Incorrect", "Correct")
+rownames(confMatrix1) <- c("Predicted Incorrect", "Predicted Correct", "Total")
+
+confMatrix2a <- as.data.frame(matrix(nrow = 3, ncol = 2))
+colnames(confMatrix2a) <- c("Incorrect", "Correct")
+rownames(confMatrix2a) <- c("Predicted Incorrect", "Predicted Correct", "Total")
+
+confMatrix3a <- as.data.frame(matrix(nrow = 3, ncol = 2))
+colnames(confMatrix3a) <- c("Incorrect", "Correct")
+rownames(confMatrix3a) <- c("Predicted Incorrect", "Predicted Correct", "Total")
+
+# Function to fill confusion matrices
+fillTable <- function(pullFrom, saveTo) {
+  for (i in 1:2){
+    for (j in 1:2){
+      saveTo[i,j] <- pullFrom[i,j]
+    }
+  }
+  saveTo[3,1] <- saveTo[1,1] + saveTo[2,1]
+  saveTo[3,2] <- saveTo[1,2] + saveTo[2,2]
+  saveTo
+} 
+
+# Call to fill confusion matrices
+confMatrix1 <-fillTable(Model1_Test_Stuff$table, confMatrix1)
+confMatrix2a <-fillTable(Model2a_Test_Stuff$table, confMatrix2a)
+confMatrix3a <-fillTable(Model3a_Test_Stuff$table, confMatrix3a)
+
+```
+
+```{r echo=FALSE, comments=NA, warning=FALSE, message =FALSE}
+knitr::kable(list(confMatrix1, confMatrix2a, confMatrix3a), caption = "Table 7. Confusion matrices for Model 1, Model 2a, and Model 3b", alig='c')
+```
+The first models to be applied to the validation data set were those involving only the working memory capacity predictors (Models 1, 2a, and 3a from Table 4). For the sake of being precise, the results of these predictions are presented in the confusion matrices on Table 7, but for the sake of clarity, analysis will focus on Figure 4.
+
+```{r, echo=FALSE, comments=NA, warning=FALSE, message =FALSE, fig.height = 3, fig.cap="Figure 4. Accuracy, sensitivity, and specificity for working memory-only models."}
+
+# data frame for figure data
+AcSenSpecModel <- as.data.frame(matrix(nrow = 9, ncol = 3))
+colnames(AcSenSpecModel) <- c("Model", "Metric", "Value")
+
+# Model names in first column
+AcSenSpecModel[1:3, 1] <- "Model 1"
+AcSenSpecModel[4:6, 1] <- "Model 2a"
+AcSenSpecModel[7:9, 1] <- "Model 3a"
+
+# Metric name in second column
+for (i in seq(1, 9, 3)){
+  AcSenSpecModel[i, 2] <- "Accuracy"
+  AcSenSpecModel[i+1, 2] <- "Sensitivity"
+  AcSenSpecModel[i+2, 2] <- "Specificity"
+}
+
+# Place values in 3rd column
+fillAcSenSpec <- function(fromMatrix, start){
+  AcSenSpecModel[start, 3] <-fromMatrix$overall[1]
+  AcSenSpecModel[start+1, 3] <-fromMatrix$byClass[1]
+  AcSenSpecModel[start+2, 3] <-fromMatrix$byClass[2]
+  AcSenSpecModel
+}
+
+# Calls to run fillAcSensSpec
+AcSenSpecModel <-fillAcSenSpec(Model1_Test_Stuff, 1)
+AcSenSpecModel <-fillAcSenSpec(Model2a_Test_Stuff, 4)
+AcSenSpecModel <-fillAcSenSpec(Model3a_Test_Stuff, 7)
+
+f3<-ggplot(AcSenSpecModel, aes(fill=Model, y=Value, x=Metric))+
+  geom_bar(position="dodge", stat="identity", width = .5)+
+  theme_classic()+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1))+
+  ylab("Metric Value") 
+
+f3
+
+```
+
+Figure 4 presents accuracy, sensitivity, and specificity, grouped by model. Examining accuracy first, it is clear that Models 1 and 2a did equally well at predicting responses, however, there was a relative decline in accuracy for Model 3a, which represented performance on the third CRT question. This occurred despite correct responders being identified at the numerically highest rate on this question (apparent in sensitivity).
+
+The accuracy decline seems to have stemmed from relative difficulty at identifying incorrect responders on Question 3. This is apparent in the relatively low specificity. This was already hinted in the examination of the training data, where it was obvious that people of a wider range of cognitive abilities were capable of responding correctly to Question 3. Whereas incorrect responders were easy to identify on the first two questions (i.e., whoever has low working memory ability), this line had blurred by the third. 
+
+Clearly a person's cognitive abilities can be used to predict their performance on the CRT, however, the predictive utility declines across items. As such, the next relevant question is whether inclusion of previous-item-responses can provide clarification and thus aid prediction of both correct and incorrect responders.
+
+
+### The Effect of Considering Previous-Trial Performance
+
+```{r echo=FALSE, comments=NA, warning=FALSE, message =FALSE}
+
+# Model 2b test data
+Model2b_Test_Probs <- predict(Item_2b, testComposites, type = "prob")
+Model2b_Test_Predict <- ifelse(Model2b_Test_Probs$`1` >.31, 1, 0)
+Model2b_Test_Stuff <- caret::confusionMatrix(as.factor(Model2b_Test_Predict), 
+                                            testComposites$CRT_2, positive = "1")
+# Model 3b test data
+Model3b_Test_Probs <- predict(Item_3b, testComposites, type = "prob")
+Model3b_Test_Predict <- ifelse(Model3b_Test_Probs$`1` >.31, 1, 0)
+Model3b_Test_Stuff <- caret::confusionMatrix(as.factor(Model3b_Test_Predict), 
+                                            testComposites$CRT_3, positive = "1")
+
+# Initialize empty confusion matrices
+confMatrix2b <- as.data.frame(matrix(nrow = 3, ncol = 2))
+colnames(confMatrix2b) <- c("Incorrect", "Correct")
+rownames(confMatrix2b) <- c("Predicted Incorrect", "Predicted Correct", "Total")
+
+confMatrix3b <- as.data.frame(matrix(nrow = 3, ncol = 2))
+colnames(confMatrix3b) <- c("Incorrect", "Correct")
+rownames(confMatrix3b) <- c("Predicted Incorrect", "Predicted Correct", "Total")
+
+# Fill confusion matrices
+confMatrix2b <-fillTable(Model2b_Test_Stuff$table, confMatrix2b)
+confMatrix3b <-fillTable(Model3b_Test_Stuff$table, confMatrix3b)
+
+```
+
+```{r echo=FALSE, comments=NA, warning=FALSE, message =FALSE}
+knitr::kable(list(confMatrix2b, confMatrix3b), caption = "Table 8. Confusion matrices for Model 2b and Model 3b", alig='c')
+```
+The confusion matrices for Models 2b and 3b, which included both working memory capacity variables and previous-item-responses are presented in Table 8. However, as before, discussion will primarily focus the data presented in Figure 5. This figure presents direct comparison of Models 2 and 3 when previous-item-responses were excluded (a) versus included (b).
+
+```{r, echo=FALSE, comments=NA, warning=FALSE, message =FALSE, fig.height = 3, fig.cap="Figure 5. Accuracy, sensitivity, and specificity comparing cognitive-only and cognitve-plus-previous-performacne models."}
+
+# data frame for figure data
+AcSenSpecModel2 <- as.data.frame(matrix(nrow = 6, ncol = 3))
+colnames(AcSenSpecModel2) <- c("Model", "Metric", "Value")
+
+# Put model names in column
+AcSenSpecModel2[1:3, 1] <- "Model 2a"
+AcSenSpecModel2[4:6, 1] <- "Model 2b"
+
+# Put metric type in column
+for (i in seq(1, 6, 3)){
+  AcSenSpecModel2[i, 2] <- "Accuracy"
+  AcSenSpecModel2[i+1, 2] <- "Sensitivity"
+  AcSenSpecModel2[i+2, 2] <- "Specificity"
+}
+
+# Put values into 3rd column
+fillAcSenSpec2 <- function(fromMatrix, start){
+  AcSenSpecModel2[start, 3] <-fromMatrix$overall[1]
+  AcSenSpecModel2[start+1, 3] <-fromMatrix$byClass[1]
+  AcSenSpecModel2[start+2, 3] <-fromMatrix$byClass[2]
+  AcSenSpecModel2
+}
+
+# Call to fillAcSensSpec
+AcSenSpecModel2 <-fillAcSenSpec2(Model2a_Test_Stuff, 1)
+AcSenSpecModel2 <-fillAcSenSpec2(Model2b_Test_Stuff, 4)
+
+
+c1<- ggplot(AcSenSpecModel2, aes(fill=Model, y=Value, x=Metric))+
+  geom_bar(position="dodge", stat="identity", width = .5)+
+  theme_classic()+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1))+
+  theme(legend.position="top")+
+  labs(title="(A)")+
+  ylab("Metric Value") 
+
+# data frame for figure data  
+AcSenSpecModel3 <- as.data.frame(matrix(nrow = 6, ncol = 3))
+colnames(AcSenSpecModel3) <- c("Model", "Metric", "Value")
+
+# Put model names in column
+AcSenSpecModel3[1:3, 1] <- "Model 3a"
+AcSenSpecModel3[4:6, 1] <- "Model 3b"
+
+# Put metric type in column
+for (i in seq(1, 6, 3)){
+  AcSenSpecModel3[i, 2] <- "Accuracy"
+  AcSenSpecModel3[i+1, 2] <- "Sensitivity"
+  AcSenSpecModel3[i+2, 2] <- "Specificity"
+}
+
+# Put values into 3rd column
+fillAcSenSpec3 <- function(fromMatrix, start){
+  AcSenSpecModel3[start, 3] <-fromMatrix$overall[1]
+  AcSenSpecModel3[start+1, 3] <-fromMatrix$byClass[1]
+  AcSenSpecModel3[start+2, 3] <-fromMatrix$byClass[2]
+  AcSenSpecModel3
+}
+
+# Call to fillAcSensSpec
+AcSenSpecModel3 <-fillAcSenSpec3(Model3a_Test_Stuff, 1)
+AcSenSpecModel3 <-fillAcSenSpec3(Model3b_Test_Stuff, 4)
+
+
+c2<- ggplot(AcSenSpecModel3, aes(fill=Model, y=Value, x=Metric))+
+  geom_bar(position="dodge", stat="identity", width = .5)+
+  theme_classic()+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1))+
+  theme(legend.position="top")+
+  labs(title="(B)")+
+  ylab("Metric Value")   
+
+  
+  c1+c2
+```
+
+It has already been noted that the inclusion of previous-item-responses may not be improving the predictive utility of the models. Examining performance on Question 2 (Figure 5a), this seems to be the case. Inclusion a person's performance on Question 1 (blue bars) did not improve accuracy of predictions, relative to the original cognitive-only model (red bars). If anything, it appears to have negatively affected sensitivity. 
+
+One concern regarding this conclusion is that the MCC analysis from Table 6 indicted that the threshold of .31 may have been too high for Model 2b, since Model 2b had the largest numerical decrease in MCC, relative to its optimal threshold. An alternate analysis was thus run in which Model 2b was allowed the optimal threshold. This analysis did not change the results in any substantial way. These results are available in Appendix E.
+
+In apparent contrast to Question 2 performance, the inclusion of previous-item-performance did, at least numerically, improve prediction of Question 3. As can be seen on Figure 5b all three metrics increased when previous-item-performance was included as a predictor. However, consistent with the analysis of training results, this trend was not reliable. A check of accuracy and associated confidence intervals reveals that accuracy on Model 3a (acc: .66, 95%CI: .57-.74) and Model 3b (acc: 74, 95%CI: .66-.81) was not distinct enough to confidently project these results to the population. The numerical differences were simply too noisy to draw a firm conclusion.
+
+It remains possible that with a larger sample (i.e., more power), previous-item-responses could result in improved fidelity of predictions. However, given these data, it also remains tenable that, while previous-item-responses improved the fit of the trained models, they do not provide enough unique information to improve predictions that are generated by the models.  
+
+
+## Summary of Results
+
+This study examined the utility of measures of working memory capacity as predictors of performance on CRT questions. Correct responses on CRT are rare, due to the misleading nature of the test. However, memory updating and maintenance ability do seem to provide promising avenues.
+
+Unfortunately, working memory capacity seemed to be more of a prerequisite for making correct responses, and is not a sufficient predictor: Although people with low working memory capacity rarely answer the questions correctly, many people with high working memory capacity often provide incorrect responses. It is hypothesized that a personality variable that predicts a person's proneness to deep thought may help differentiate between people with high working memory capacity who are likely to recognize that the CRT questions are misleading, and those who are not.
+
+An additional concern that could not be rectified within this data set was that the working memory variables did not perform as well when predicting performance on the third item. This may be a reflection of people catching onto the intentionally misleading nature of CRT, and thus being more careful with their responses. As a byproduct, working memory capacity may become less important to performance. However, the present shortcoming is that, since CRT items were always presented in the same order, the third question may simply be easier to answer. This would also make working memory capacity less important to predictions.
+
+Setting aside the need for further research, the present data are quite clear. Individual differences in working memory capacity are predictive of CRT performance. By extension, this is interpreted to mean that cognitive ability does indeed predict a person's tendency to slow down and consider that their reasoning has been is faulty.
+
+\pagebreak
+
+## References
+
+Engle, R. W. (2002). Working memory capacity as executive attention. Current Directions in Psychological Science, 11, 19-23. 
+
+Fukuda, K., & Vogel, E. K. (2011). Individual differences in recovery time from attentional capture. Psychological Science, 22, 361-368. 
+
+Kahneman, D. (2003). A perspective on judgment and choice: Mapping bounded rationality. American Psychologist, 58(9), 697–720.
+
+Kleider, H. M., Parrott, D. J., & King, T. Z. (2009). Shooting behaviour: How working memory and negative emotionality influence police shoot decisions. Applied Cognitive Psychology, 23, 1-11. 
+
+Martin, J. D., Shipstead, Z., Harrison, T. L., Reddick, T. S., Bunting, M, & Engle, R. W. (2020). The Role of Maintenance and Disengagement in Predicting Reading Comprehension and Vocabulary Learning. Journal of Experimental Psychology: Learning, Memory, & Cognition, 46, 140-154.
+
+McVay, J. C., & Kane, M. J. (2011). Why does working memory capacity predict variation in reading comprehension? On the influence of mind wandering and executive attention. Journal of Experimental Psychology: General, 141, 302-320. 
+
+Oberauer, K., Schulze, R., Wilhelm, O., & Süß, H. M. (2005). Working memory and intelligence - their correlation and their relation: A comment on Ackerman, Beier, and Boyle (2005). Psychological Bulletin, 131, 61-65.
+
+Shipstead, Z., Harrison, T. L., & Engle, R. W. (2016). Working memory capacity and fluid intelligence: Maintenance and disengagement. Perspectives on Psychological Science, 11, 771-799.
+
+Shute, V. (1991). Who is likely to acquire programming skills? Journal of Educational Computing Research, 7, 1-24.
+
+Stanovich, K. E., & West, R. F. (2000). Individual differences in reasoning: Implications for the rationality debate? Behavioral and Brain Sciences, 23(5), 645–665.
+
+
+
+
+
+
+\pagebreak
+
+## Appendix A: Cognitive Reflection Test Questions
+
+**Question 1:** A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How much does the ball cost?
+
+Impression:  10 cents  
+Correct Answer: 5 cents
+
+**Question 2:** If it takes 5 machines 5 minutes to make 5 widgets, how long would it take 100 machines to make 100 widgets?
+
+Impression: 100 minutes  
+Correct Answer: 5 minutes
+
+**Question 3:** In a lake, there is a patch of lily pads. Every day, the patch doubles in size. If it takes 48 days for the patch to cover the entire lake, how long would it take for the patch to cover half of the lake?
+
+Impression: 24 days  
+Correct Answer: 47 days
+
+\pagebreak
+
+## Appendix B: Examples of Working Memory Tests
+
+### Attention tests
+
+![imaage](/Users/zachshipstead/PC Docs/R files/Machine Learning/CRT Prediction/3. CRT writeup/Images/antisaccade.png )
+Figure B1. Attention control example: The antisaccade test
+
+
+Figure B1 displays an attention test known as the antisaccade. The essence of this type of test is to create a situation in which a reflex comes into conflict with a task requirement. In this case, a star flashes on one side of a computer screen, leading to the impulse to look to that side. However, the test taker must override this reflex and look to the opposite side of the screen where a letter is briefly presented and then masked.
+
+The dependent measure is accuracy across several trials. The attention control composite score was created using two variants of the antisaccade test.  
+
+### Working Memory Maintenance Tests
+
+![imange](/Users/zachshipstead/PC Docs/R files/Machine Learning/CRT Prediction/3. CRT writeup/Images/ospan.png)
+Figure B2. Working memory maintenance example: The operation span test
+
+
+Figure B2 displays a prototypical working memory maintenance test, known as the operation span test (sometimes known as Ospan). Test takers are required to remember a list of between 3-7 letters per trial. Maintenance of this information is continually disrupted by the requirement that test takers solve mathematical equations in between the presentations. This secondary task requirement is disruptive to short term memory and thus the test taker is required to engage attention and memory retrieval in order to keep the primary information accessible.
+
+The dependent measure is the number of items recalled in their correct serial position. The working memory maintenance composite score was based on the operations span and two similar tests. One of which required memory for locations on a spatial grid, and the other that required memory for the direction of arrows.  
+
+### Working Memory Updating Tests  
+
+![image](/Users/zachshipstead/PC Docs/R files/Machine Learning/CRT Prediction/3. CRT writeup/Images/runningspan.png)
+Figure B3. Working memory updating example: The running memory span test
+
+
+Figure B3 displays the running memory span test. In this version of the test a long string of digits is presented on a computer screen, one at a time. When the presentation ends the test taker is cued to recall the last 3-7 digits from the list. The challenge presented by this test is that the early items generate interference in memory. In turn it becomes difficult to remember the relevant items. Test takers who can put early items out of mind (keep memory clean) will excel at test performance.
+
+The memory updating composite included (1) a composite of three varieties of verbal and spatial running memory span, (2) a composite of 3 varieties of n-back, and (3) a keeping track test. N-back presents a list of information and the test taker must indicate when the current item matches an item that was presented 3-items-ago on the list. Keeping track presents a list of items and the test taker must remember the most recently presented items from specific categories (e.g., remember the most recently presented metal, animal, and color).
+
+\pagebreak
+
+## Appendix C: Descriptive Statistics for Working Memory Tests
+
+
+```{r, echo=FALSE, comment=NA, table=FALSE} 
+
+setwd("~/PC Docs/R files/Machine Learning/CRT Prediction/1 Raw Data")
+omniData <- read.csv("omniData.csv")
+setwd("/Users/zachshipstead/PC Docs/R files/Machine Learning/CRT Prediction/3. CRT writeup")
+descTable <- t(psych::describe(omniData[c(10,11,3:8, 20, 9)])[c(3,4,8,9,11,12)])
+colnames(descTable) <- c("AntiSac1", "AntiSac2", "Ospan", "SymSpan", "RotSpan", "RunSpan1", "RunSpan2", "RunSpan3", "N_back", "KeepTrack")
+knitr::kable(descTable, caption = "Descriptive statistics for tests used to make the working memory capacity z-scores.", digits = 2, align='c')
+```
+Attention = Tests 1-2, Maintenance = Tests 3-5, Updating = Tests 6-10
+
+
+\pagebreak
+
+## Appendix D: MCC by Threshold
+
+```{r, echo=FALSE, comment=NA} 
+plot(MCC_Q1[1:100,], type="l", ylim = c(0, .75), main = "MCC by threshold: Model 1")
+
+```
+
+```{r, echo=FALSE, comment=NA} 
+plot(MCC_Q2a[1:100,], type="l", ylim = c(0, .75), main = "MCC by threshold: Model 2a")
+
+```
+
+
+```{r, echo=FALSE, comment=NA} 
+plot(MCC_Q2b[1:100,], type="l", ylim = c(0, .75), main = "MCC by threshold: Model 2b")
+
+```
+
+```{r, echo=FALSE, comment=NA} 
+plot(MCC_Q3a[1:100,], type="l", ylim = c(0, .75), main = "MCC by threshold: Model 3a")
+
+```
+
+
+```{r, echo=FALSE, comment=NA} 
+plot(MCC_Q3b[1:100,], type="l", ylim = c(0, .75), main = "MCC by threshold: Model 3b")
+
+```
+\pagebreak
+
+## Appendix E: Question 2b with Optimal MCC
+```{r, echo=FALSE, comments=NA, warning=FALSE, message =FALSE, fig.height = 3, fig.cap="Accuracy, sensitivity, and specificity comparing models of Question 2 perfomrance: Optimal threshold added."}
+
+# Model 2balt test data
+Model2b_Test_Probs_alt <- predict(Item_2b, testComposites, type = "prob")
+Model2b_Test_Predict_alt <- ifelse(Model2b_Test_Probs_alt$`1` >.26, 1, 0)
+Model2b_Test_Stuff_alt <- caret::confusionMatrix(as.factor(Model2b_Test_Predict_alt), 
+                                            testComposites$CRT_2, positive = "1")
+
+# Make Figure
+AcSenSpecModel5 <- as.data.frame(matrix(nrow = 6, ncol = 3))
+colnames(AcSenSpecModel5) <- c("Model", "Metric", "Value")
+
+# Model Name in rows
+AcSenSpecModel5[1:3, 1] <- "Model 2a"
+AcSenSpecModel5[4:6, 1] <- "Model 2b"
+AcSenSpecModel5[7:9, 1] <- "Model 2b: Optimal Threshold"
+
+# Put metric in Rows
+for (i in seq(1, 9, 3)){
+  AcSenSpecModel5[i, 2] <- "Accuracy"
+  AcSenSpecModel5[i+1, 2] <- "Sensitivity"
+  AcSenSpecModel5[i+2, 2] <- "Specificity"
+}
+
+# Put associated values into Value column
+fillAcSenSpec5 <- function(fromMatrix, start){
+  AcSenSpecModel5[start, 3] <-fromMatrix$overall[1]
+  AcSenSpecModel5[start+1, 3] <-fromMatrix$byClass[1]
+  AcSenSpecModel5[start+2, 3] <-fromMatrix$byClass[2]
+  AcSenSpecModel5
+}
+
+# Call fill AcSenSpec
+AcSenSpecModel5 <-fillAcSenSpec5(Model2a_Test_Stuff, 1)
+AcSenSpecModel5 <-fillAcSenSpec5(Model2b_Test_Stuff, 4)
+AcSenSpecModel5 <-fillAcSenSpec5(Model2b_Test_Stuff_alt, 7)
+
+
+Q2_26<- ggplot(AcSenSpecModel5, aes(fill=Model, y=Value, x=Metric))+
+  geom_bar(position="dodge", stat="identity", width = .5)+
+  theme_classic()+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1))+
+  ylab("Metric Value") 
+  
+  Q2_26
+```
+
+
+
+
